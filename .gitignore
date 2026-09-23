@@ -1,0 +1,9 @@
+# Generated and independently archived edit inputs, not Git blobs.
+__pycache__/
+*.pyc
+clips/
+vraw/
+parts/
+img/
+audio/
+*.zip

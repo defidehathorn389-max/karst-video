@@ -4,9 +4,10 @@ import cairo, math, json, random, subprocess, sys, os, re
 import numpy as np
 from PIL import Image, ImageFilter
 from functools import lru_cache
+import imageio_ffmpeg
 
 W, H, FPS = 1920, 1080, 24
-FF = '/usr/local/lib/python3.13/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2'
+FF = imageio_ffmpeg.get_ffmpeg_exe()
 SERIF, SANS = 'Noto Serif CJK SC', 'Noto Sans CJK SC'
 GOLD = (0.91, 0.69, 0.29); WHITE = (1, 1, 1); NAVY = (0.05, 0.09, 0.12)
 WATER = (0.31, 0.70, 0.85); LIME = (0.80, 0.77, 0.70)

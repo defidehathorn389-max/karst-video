@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Rebuild the Wikimedia video inputs for the editable v3 project.
+"""Rebuild the Wikimedia video inputs for the editable v4 project.
 
-Only assets used in v3 are downloaded, sequentially, with an honest source list
+Only assets used in v4 are downloaded, sequentially, with an honest source list
 in vsel.json. Do not run this module in parallel against Wikimedia Commons.
-Install pycairo, numpy, pillow, imageio-ffmpeg first (see README_v3.md).
+Install imageio-ffmpeg and FFmpeg first (see README_v4.md).
 """
 import json, os, subprocess, time
 import imageio_ffmpeg

@@ -1,0 +1,6 @@
+# Dependencies for project v4 source restoration; virtualenv recommended.
+pycairo>=1.25,<2
+numpy>=1.26,<3
+Pillow>=10,<13
+imageio-ffmpeg>=0.4.9,<1
+pyshp>=2.3,<3  # only required to regenerate the Natural Earth c.json replacement

@@ -41,3 +41,7 @@ FF=$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')
 ## GitHub 发布
 
 已发布在 [v4.0 Releases](../../releases/tag/v4.0)；仓库根目录 `karst.mp4` 是 1080p 压缩版，高清母版 [karst_v4_1080p_HQ.mp4](../../releases/download/v4.0/karst_v4_1080p_HQ.mp4) 在发布页。旧版仍留在历史 Release 中供对比。
+
+## 工程恢复补充（发布后）
+
+无需重复上传 v4。可从仓库根目录 [`RECOVERY_v4.json`](../RECOVERY_v4.json) 下载 [v4 源输入恢复包](../../releases/download/v4.0/karst_v4_recovery_inputs.zip)，先验压缩包和逐文件 SHA256，再按压缩包中的 `README_RESTORE.md` 恢复镜头。包内声音、授权图片、原创图解和脚本可用于新剪辑；14 个 Commons 实拍片段须按 `vsel.json`/`restore_used.py` 重新获取。兼容 `c.json` 来自 Natural Earth（非原发布时地图源），因此**不能声称位级重建 v4**。`render.py` 已改为从 imageio-ffmpeg 动态获取可执行文件路径。

@@ -11,3 +11,5 @@
 
 v4.0 Release：https://github.com/defidehathorn389-max/karst-video/releases/tag/v4.0  
 高清母版：https://github.com/defidehathorn389-max/karst-video/releases/download/v4.0/karst_v4_1080p_HQ.mp4
+
+后续追加的 `karst_v4_recovery_inputs.zip` 仅为**新版本编辑工程的恢复输入包**，不替换 v4 普通版或高清成片。归档包含逐文件清单和授权记录；外部实拍不在包内，旧省界改用许可明确的 Natural Earth 兼容底图，故不能保证完全相同的再次编码结果。详情见仓库根目录 `RECOVERY_v4.json`。
