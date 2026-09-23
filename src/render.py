@@ -142,6 +142,9 @@ for line in open('credits.tsv', encoding='utf-8'):
 def credit_tag(c, path, a=1):
     if path.startswith('img/ai_'):
         s = 'AI 生成示意图'
+    elif path in CREDITS and path.startswith('clips/'):
+        ti, au, lic = CREDITS[path]
+        s = f'视频 © {au} / {lic} / Wikimedia Commons'
     elif path in CREDITS:
         _, au, lic = CREDITS[path]
         au = au.split('\n')[0][:40]
@@ -799,9 +802,9 @@ def card_end(c, t, D):
     text(c, 'THIS IS KARST', W / 2, 640, 26, GOLD, a, align='c', spacing=6)
     # 滚动鸣谢
     if t > 6.5:
-        lines = ['素材鸣谢 · Image Credits', '']
+        lines = ['素材鸣谢 · Image & Video Credits', '']
         for k, (ti, au, lic) in CREDITS.items():
-            if any(k == u for u in USED):
+            if k in USED:
                 lines.append(f'{ti[:60]}  —  {au.splitlines()[0][:40]}  ({lic})')
         lines += ['', '部分示意画面由 AI 生成 · 动画与图解为原创绘制', '地图数据：Natural Earth（公有领域）', '', '感谢观看']
         y0 = H + 40 - (t - 6.5) * 95
@@ -810,6 +813,66 @@ def card_end(c, t, D):
             if -40 < yy < H + 40:
                 big = i == 0 or l == '感谢观看'
                 text(c, l, W / 2, yy, 36 if big else 24, GOLD if big else WHITE, 0.95, align='c', bold=big)
+
+
+# ---------------------------------------------------------------- video clips
+VCRED = {
+ 'clips/halong.mp4': ('Ha Long Bay, Vietnam - Dec 2024', 'പയ്യൻ', 'CC BY-SA 4.0'),
+ 'clips/halong_boat.mp4': ('Halong Bay 20220801', 'L. Shyamal', 'CC BY-SA 4.0'),
+ 'clips/janicja_a.mp4': ('Janicja Jama (Slovenia)', 'caveman0043', 'CC BY 3.0'),
+ 'clips/rak.mp4': ('River Rak going underground', 'Malenki', 'CC BY-SA 3.0'),
+ 'clips/planina.mp4': ('Planina Cave, Slovenia', 'allergyforsun', 'CC BY 3.0'),
+ 'clips/coral.mp4': ('Chesterfield-Bellona reef', 'Dominique Pelletier', 'CC BY 4.0'),
+ 'clips/redsea.mp4': ('Das Rote Meer. Unterwasserwelt', 'Kora27', 'CC BY-SA 4.0'),
+ 'clips/rain.mp4': ('Rain drops - Japan', 'Nesnad', 'CC BY 4.0'),
+ 'clips/seep.mp4': ('Grand Canyon NP - Seep Spring', 'Grand Canyon NPS', 'Public domain'),
+ 'clips/monsoon.mp4': ('Timelapse 2025 Kinnaur Monsoon', 'Dfromhimalayas', 'CC BY 4.0'),
+ 'clips/drip.mp4': ('Tropfsteine als Indikatoren für den Klimawandel', 'ZDF/Terra X', 'CC BY 4.0'),
+ 'clips/forest.mp4': ('From the mountain high, the forest stretches...', 'Mathanprasath K', 'CC BY 4.0'),
+ 'clips/kostivere.mp4': ('Kostivere karst area, spring 2021', 'Sillerkiil', 'CC0'),
+ 'clips/clouds.mp4': ('Time Lapse Clouds above Steens Mountain', 'BLM Oregon & Washington', 'Public domain'),
+}
+CREDITS.update(VCRED)
+
+class VideoSrc:
+    def __init__(s, path):
+        s.path = path; s.proc = None; s.next = 0; s.buf = None; s.surf = None
+        s.n = int(dur_of(path) * FPS) - 1
+    def _start(s, idx):
+        if s.proc: s.proc.kill(); s.proc.wait()
+        s.proc = subprocess.Popen([FF, '-loglevel', 'quiet', '-threads', '1', '-ss', f'{idx / FPS:.4f}', '-i', s.path, '-f', 'rawvideo',
+                                   '-pix_fmt', 'bgra', '-'], stdout=subprocess.PIPE)
+        s.next = idx
+    def close(s):
+        if s.proc: s.proc.kill(); s.proc.wait(); s.proc = None
+        s.buf = None; s.surf = None
+    def frame(s, idx):
+        idx = max(0, min(idx, s.n))
+        if s.buf is not None and idx == s.next - 1: return s.surf
+        if s.proc is None or idx < s.next or idx > s.next + 48: s._start(idx)
+        while s.next <= idx:
+            data = s.proc.stdout.read(W * H * 4)
+            if len(data) < W * H * 4:
+                s.n = s.next - 1; break
+            s.buf = bytearray(data); s.next += 1
+        if s.buf is None: s.buf = bytearray(W * H * 4)
+        s.surf = cairo.ImageSurface.create_for_data(s.buf, cairo.FORMAT_ARGB32, W, H, W * 4)
+        return s.surf
+
+_VS = {}
+def V_(path, tag=None, zoom='in'):
+    def f(c, t, D):
+        if path not in _VS: _VS[path] = VideoSrc(path)
+        surf = _VS[path].frame(int(t * FPS))
+        k = min(1, max(0, t / D))
+        z = lerp(1.0, 1.05, k) if zoom == 'in' else lerp(1.05, 1.0, k)
+        c.save(); c.translate(W / 2, H / 2); c.scale(z, z); c.translate(-W / 2, -H / 2)
+        c.set_source_surface(surf, 0, 0); c.get_source().set_filter(cairo.FILTER_BILINEAR); c.paint(); c.restore()
+        if tag:
+            loc_tag(c, tag[0], tag[1], seg(t, 0.4, 1.2) * (1 - seg(t, D - 0.6, D)))
+        credit_tag(c, path, seg(t, 0.2, 0.8))
+    f.path = path
+    return f
 
 # ---------------------------------------------------------------- timeline
 def P_(path, move='in', tag=None):
@@ -826,31 +889,42 @@ AUD = {i: dur_of(f'audio/s{i}.mp3') for i in range(1, 9)}
 R = 'rest'
 BLOCKS = [
     # (audio, lead, tail, [(dur, fn)])
-    (1, 1.2, 0.8, [(6, P_('img/ai_aerial.jpg', 'in')), (5, P_('img/guilin_0.jpg', 'right', ('广西 · 漓江', 'LI RIVER, GUANGXI'))),
-                   (5, P_('img/stoneforest_1.jpg', 'left', ('云南 · 石林', 'SHILIN, YUNNAN'))),
-                   (5, P_('img/cave_1.jpg', 'in', ('广西 · 芦笛岩', 'REED FLUTE CAVE'))), (5, P_('img/xiaozhai_0.jpg', 'down', ('重庆 · 小寨天坑', 'XIAOZHAI TIANKENG'))),
+    (1, 1.2, 0.8, [(5, P_('img/ai_aerial.jpg', 'in')),
+                   (4, V_('clips/halong.mp4', ('越南 · 下龙湾', 'HA LONG BAY · SAME KARST BELT'))),
+                   (4, P_('img/guilin_0.jpg', 'right', ('广西 · 漓江', 'LI RIVER, GUANGXI'))),
+                   (4, P_('img/stoneforest_1.jpg', 'left', ('云南 · 石林', 'SHILIN, YUNNAN'))),
+                   (3.5, V_('clips/janicja_a.mp4', ('溶洞', 'KARST CAVE'))),
+                   (4, V_('clips/rak.mp4', ('暗河', 'UNDERGROUND RIVER'))),
+                   (4.5, P_('img/xiaozhai_0.jpg', 'down', ('重庆 · 小寨天坑', 'XIAOZHAI TIANKENG'))),
                    (R, P_('img/fengcong2_0.jpg', 'right', ('贵州 · 万峰林', 'WANFENGLIN, GUIZHOU')))]),
     (None, 0, 6, [(6, card_title)]),
-    (2, 0.5, 0.8, [(13, anim_world), (17, anim_china), (4.5, P_('img/stoneforest_2.jpg', 'in', ('云南 · 石林', 'SHILIN, YUNNAN'))),
+    (2, 0.5, 0.8, [(9.5, anim_world), (3.5, V_('clips/planina.mp4', ('斯洛文尼亚 · 喀斯特', 'KRAS, SLOVENIA'))),
+                   (17, anim_china), (4.5, P_('img/stoneforest_2.jpg', 'in', ('云南 · 石林', 'SHILIN, YUNNAN'))),
                    (4.5, P_('img/libo2_1.jpg', 'up', ('贵州 · 荔波小七孔', 'XIAOQIKONG, LIBO'))), (R, P_('img/guilin_1.jpg', 'left', ('广西 · 阳朔', 'YANGSHUO, GUANGXI')))]),
     (None, 0, 3.5, [(3.5, make_chapter('01', '远古海洋', 'THE ANCIENT SEA', 'img/ai_sea.jpg'))]),
-    (3, 0.3, 0.8, [(8, P_('img/ai_sea.jpg', 'in')), (6, P_('img/coral_0.jpg', 'right')), (21, anim_deposit),
-                   (7, P_('img/limestone_0.jpg', 'in', ('石灰岩中的化石', 'FOSSILS IN LIMESTONE'))), (R, P_('img/limestone_1.jpg', 'out'))]),
+    (3, 0.3, 0.8, [(5, P_('img/ai_sea.jpg', 'in')), (7, V_('clips/coral.mp4', ('今天的珊瑚礁', 'MODERN CORAL REEF'))),
+                   (6, V_('clips/redsea.mp4')), (21, anim_deposit),
+                   (6, P_('img/limestone_0.jpg', 'in', ('石灰岩中的化石', 'FOSSILS IN LIMESTONE'))), (R, P_('img/limestone_1.jpg', 'out'))]),
     (None, 0, 3.5, [(3.5, make_chapter('02', '大地抬升', 'THE RISE OF THE LAND', 'img/fengcong2_1.jpg'))]),
     (4, 0.3, 0.8, [(19, anim_plates), (16, anim_fold), (R, P_('img/fengcong2_1.jpg', 'right', ('贵州 · 兴义', 'XINGYI, GUIZHOU')))]),
     (None, 0, 3.5, [(3.5, make_chapter('03', '水的雕刻', 'CARVED BY WATER', 'img/yangshuo_2.jpg'))]),
-    (5, 0.3, 0.8, [(6, P_('img/yangshuo_2.jpg', 'in', ('广西 · 阳朔', 'YANGSHUO, GUANGXI'))), (24, anim_chem), (12, anim_rate),
-                   (R, P_('img/fengcong2_0.jpg', 'left'))]),
+    (5, 0.3, 0.8, [(6, V_('clips/rain.mp4')), (23, anim_chem), (4.8, V_('clips/seep.mp4', ('渗流', 'SEEPAGE'))),
+                   (10, anim_rate), (R, V_('clips/monsoon.mp4', ('季风降水', 'MONSOON RAIN')))]),
     (None, 0, 3.5, [(3.5, make_chapter('04', '石峰的演化', 'FROM PILLARS TO PEAKS', 'img/stoneforest_0.jpg'))]),
     (6, 0.3, 0.8, [(7.8, P_('img/stoneforest_0.jpg', 'right', ('云南 · 石林', 'SHILIN, YUNNAN'))), (42, anim_evolve),
                    (R, P_('img/yangshuo_0.jpg', 'in', ('孤峰 · 阳朔月亮山', 'MOON HILL, YANGSHUO')))]),
     (None, 0, 3.5, [(3.5, make_chapter('05', '地下世界', 'THE UNDERWORLD', 'img/ai_river.jpg'))]),
-    (7, 0.3, 0.8, [(6, P_('img/ai_river.jpg', 'in')), (20, anim_cave), (5, P_('img/stalactite_0.jpg', 'down', ('重庆 · 丰都雪玉洞', 'SNOWY JADE CAVE'))),
-                   (4, P_('img/cave_2.jpg', 'in')), (7, lambda c, t, D: anim_cave(c, t, D, True)),
-                   (R, P_('img/xiaozhai_0.jpg', 'in', ('重庆奉节 · 小寨天坑', 'XIAOZHAI TIANKENG, FENGJIE')))]),
+    (7, 0.3, 0.8, [(3.5, V_('clips/planina.mp4', ('地下河出口', 'RESURGENCE'))), (3.5, P_('img/ai_river.jpg', 'in')), (18, anim_cave),
+                   (5, V_('clips/drip.mp4', ('钟乳石与石笋', 'STALACTITES'))),
+                   (7, lambda c, t, D: anim_cave(c, t, D, True)),
+                   (6.5, P_('img/xiaozhai_0.jpg', 'in', ('重庆奉节 · 小寨天坑', 'XIAOZHAI TIANKENG, FENGJIE'))),
+                   (R, P_('img/xiaozhai_1.jpg', 'down'))]),
     (None, 0, 3.5, [(3.5, make_chapter('06', '脆弱与守护', 'FRAGILITY & CARE', 'img/ai_desert.jpg'))]),
-    (8, 0.3, 1.5, [(11, anim_soil), (9, P_('img/ai_desert.jpg', 'right', ('石漠化', 'ROCKY DESERTIFICATION'))), (9, P_('img/ai_green.jpg', 'in', ('重披绿装', 'REFORESTATION'))),
-                   (17, anim_timeline), (R, P_('img/guilin_2.jpg', 'out'))]),
+    (8, 0.3, 1.5, [(11, anim_soil), (5, V_('clips/kostivere.mp4', ('裸露的石灰岩', 'BARE LIMESTONE'))),
+                   (6, P_('img/ai_desert.jpg', 'right', ('石漠化', 'ROCKY DESERTIFICATION'))),
+                   (5, P_('img/ai_green.jpg', 'in', ('重披绿装', 'REFORESTATION'))), (4.6, V_('clips/forest.mp4')),
+                   (5, V_('clips/clouds.mp4')), (17, anim_timeline),
+                   (5, V_('clips/halong_boat.mp4')), (R, P_('img/guilin_2.jpg', 'out'))]),
     (None, 0, 30, [(30, card_end)]),
 ]
 
@@ -927,6 +1001,10 @@ def render_frame(c, t):
         if s <= t < s + d: idx = i; break
     else: idx = len(SHOTS) - 1
     s, d, fn = SHOTS[idx]
+    keep = {getattr(fn, 'path', None)}
+    if idx > 0: keep.add(getattr(SHOTS[idx - 1][2], 'path', None))
+    for pth in list(_VS):
+        if pth not in keep: _VS.pop(pth).close()
     c.set_source_rgb(0, 0, 0); c.paint()
     fn(c, t - s, d)
     if idx > 0 and t - s < XF:
@@ -943,7 +1021,7 @@ def render(f0, f1, out):
     surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
     c = cairo.Context(surf)
     p = subprocess.Popen([FF, '-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'bgra', '-s', f'{W}x{H}', '-r', str(FPS), '-i', '-',
-                          '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p', '-threads', '1', out], stdin=subprocess.PIPE)
+                          '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-x264-params', 'rc-lookahead=10:threads=1', '-pix_fmt', 'yuv420p', out], stdin=subprocess.PIPE)
     for fi in range(f0, f1):
         render_frame(c, fi / FPS)
         surf.flush()
