@@ -84,6 +84,6 @@
 - 静态恢复索引：[`RECOVERY_v4.json`](RECOVERY_v4.json)，列明已发布视频 SHA256、可重建源码提交与恢复包哈希。
 - [v4 源输入恢复包](../../releases/download/v4.0/karst_v4_recovery_inputs.zip)（约 21 MB，**不含视频成片和 14 个第三方实拍片段**）；解压前先按恢复索引校验 SHA256，再查压缩包内 `MANIFEST.json`、`README_RESTORE.md`、`CREDITS_USED.md`。
 - 恢复包含真实项目音轨、实际使用的授权图片、原创概念图、脚本及 Natural Earth 地图；由于旧版 `c.json` 原始省界数据的再分发授权未核实，包中**以公有领域 Natural Earth 省界重建兼容的 `c.json`**。实拍须依 Commons 来源与许可另行下载；因此足以从已发布作品继续制作/修改，**不能保证与 v4 成片逐像素一致**。旧版视频本身未更改。
-- 本类视频的通用制作和“私有进度库不可访问”接续方法见独立公开 Skill：[`geo-documentary-video-skill`](https://github.com/defidehathorn389-max/geo-documentary-video-skill)；动态用户决定、待办与当前进度仅在用户授权的私有 `agent-progress`，不在此公开仓库伪造。
+- 本类视频的通用制作和“私有进度库不可访问”接续方法见独立公开 Skill：[`explainer-video-skill`](https://github.com/defidehathorn389-max/explainer-video-skill)（跨题材制作方法；喀斯特仅为历史案例）；动态用户决定、待办与当前进度仅在用户授权的私有 `agent-progress`，不在此公开仓库伪造。
 
 > 时长提示：v4 为 7:33，超过最初 5–6 分钟目标；以后若要 5–6 分钟的新剪辑须重写/重录或先得到新确认，不能将历史已发布版本视作满足原范围。
