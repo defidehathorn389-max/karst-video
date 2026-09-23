@@ -20,8 +20,17 @@ v4 继续升级动画，尤其是 **04:15–04:57 的地貌演化** 和 **05:14�
 python -m pip install pycairo pillow numpy imageio-ffmpeg
 python restore_used.py
 python render.py info
-python render.py render 2 0   # 低内存机器切勿并行
-python render.py render 2 1
+# 依次渲染，勿并行。约 2GB 内存时后半段应拆为三个短分段。
+python render.py render 2 0
+python -c "import render; render.render(5441,7400,'parts/p1a.mp4')"
+python -c "import render; render.render(7400,9050,'parts/p1b.mp4')"
+python -c "import render; render.render(9050,10883,'parts/p1c.mp4')"
+cat > parts/list.txt <<'EOF'
+file 'p0.mp4'
+file 'p1a.mp4'
+file 'p1b.mp4'
+file 'p1c.mp4'
+EOF
 FF=$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')
 "$FF" -y -f concat -safe 0 -i parts/list.txt -i audio/mix.m4a \
   -map 0:v:0 -map 1:a:0 -c:v copy -c:a copy -movflags +faststart -shortest v4_master.mp4

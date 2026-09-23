@@ -8,3 +8,6 @@
 - 图解是科普示意，不对应某一实景地形的精确测量。
 
 主文件：`喀斯特_中国南方的石头森林_v4.mp4`，约 98MiB。动画源码：`v4graphics.py`、`premium.py`、`render.py`。原照片与视频作者/许可详见 `credits.tsv`、`render.py` 的 `VCRED`、`vsel.json` 及片尾。
+
+v4.0 Release：https://github.com/defidehathorn389-max/karst-video/releases/tag/v4.0  
+高清母版：https://github.com/defidehathorn389-max/karst-video/releases/download/v4.0/karst_v4_1080p_HQ.mp4
