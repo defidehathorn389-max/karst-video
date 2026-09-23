@@ -1,0 +1,49 @@
+{
+  "schema": "geo-video-recovery/1",
+  "project": "karst-video",
+  "release": "v4.0",
+  "project_repo": "https://github.com/defidehathorn389-max/karst-video",
+  "source_commit": "eda64480f722aabcff9be5bfbd4277c9ab6c239e",
+  "finished_video": {
+    "repo_path_at_source_commit": "karst.mp4",
+    "repository_root_sha256_verified": "1d2f2d6498fca931a7825f70741e74bb089d0a39a4a859c88960a63c03a0525f",
+    "bytes": 101884159,
+    "release_asset_url": "https://github.com/defidehathorn389-max/karst-video/releases/download/v4.0/karst_v4_1080p.mp4",
+    "hq_release_asset_url": "https://github.com/defidehathorn389-max/karst-video/releases/download/v4.0/karst_v4_1080p_HQ.mp4",
+    "note": "The GitHub repository root MP4 was hashed against the local v4 and matched. The Release ordinary asset was independently checked for presence and byte length, not downloaded and hashed here."
+  },
+  "source_bundle": {
+    "url": "https://github.com/defidehathorn389-max/karst-video/releases/download/v4.0/karst_v4_recovery_inputs.zip",
+    "asset_name": "karst_v4_recovery_inputs.zip",
+    "bytes": 20923608,
+    "sha256": "17e556838a5749730b334a9cfdc8530f4c4f2b88c932ff31a33e1c9dc09399b8",
+    "manifest_path_inside_archive": "MANIFEST.json",
+    "manifest_file_count": 53,
+    "content": "Actual v4 audio segments + mix, eight scripts, only 20 used still/concept images, original graphics/render/footage-recovery scripts, provenance records, Natural Earth maps (one compatible replacement). No final movie and no third-party stock MP4."
+  },
+  "external_footage": {
+    "included_in_bundle": false,
+    "source_list": "vsel.json and CREDITS_USED.md inside source bundle",
+    "recovery_method": "Review live Wikimedia Commons file page and permission, then run restore_used.py sequentially; replace licensed clips transparently if unavailable",
+    "count": 14,
+    "bit_exact_rebuild_guaranteed": false
+  },
+  "map_input": {
+    "historic_v4_province_map_in_bundle": false,
+    "reason": "Redistribution permission for the earlier province dataset was not established",
+    "compatible_substitute": "Public-domain Natural Earth 50m admin-1 5.1.1 plus admin-0 (c.json in bundle)",
+    "effect": "This map and mutable upstream stock transcodes can alter a new render; do not claim pixel- or bit-identical reproduction"
+  },
+  "local_checks_at_creation": [
+    "Source archive path and entry types inspected before extraction",
+    "All 53 manifest-listed files matched bytes + SHA256 with strict extra-file rejection",
+    "render.py info loaded from unpacked source and reported TOTAL 453.48 seconds / 10883 frames",
+    "Four still frames of unpacked source rendered, including Natural Earth map and original cave diagram"
+  ],
+  "not_checked_at_creation": [
+    "All 14 external Wikimedia stock video sources currently still downloadable",
+    "Complete re-rendering with newly recovered footage or pixel-identical match to released v4",
+    "User approval of historic duration, voice or unpublished edits"
+  ],
+  "scope_note": "This is a static published-version recovery index, not a private agent-progress HEAD/checkpoint or permission to publish changes."
+}
