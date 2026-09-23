@@ -884,6 +884,14 @@ def P_(path, move='in', tag=None):
     f.path = path
     return f
 
+# v3: original premium cartography, stratigraphy and 2.5D motion-graphics system.
+# The shot schedule, licensed footage, narration and subtitles remain unchanged.
+import premium
+premium.install(globals())
+# v4: shaded-relief terrain morph and layered subsurface cutaway.
+import v4graphics
+v4graphics.install(globals())
+
 A = lambda fn: fn
 AUD = {i: dur_of(f'audio/s{i}.mp3') for i in range(1, 9)}
 R = 'rest'
