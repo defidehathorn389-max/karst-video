@@ -31,4 +31,4 @@ FF=$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')
 
 ## GitHub 发布
 
-已发布在 [v4.0 Releases](../../releases/tag/v4.0)；仓库根目录 `karst.mp4` 是 1080p 压缩版，发布页提供高清母版。旧版仍留在历史 Release 中供对比。
+已发布在 [v4.0 Releases](../../releases/tag/v4.0)；仓库根目录 `karst.mp4` 是 1080p 压缩版，高清母版 [karst_v4_1080p_HQ.mp4](../../releases/download/v4.0/karst_v4_1080p_HQ.mp4) 在发布页。旧版仍留在历史 Release 中供对比。

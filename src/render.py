@@ -1010,7 +1010,10 @@ def render_frame(c, t):
     else: idx = len(SHOTS) - 1
     s, d, fn = SHOTS[idx]
     keep = {getattr(fn, 'path', None)}
-    if idx > 0: keep.add(getattr(SHOTS[idx - 1][2], 'path', None))
+    # The previous shot is decoded only for the 0.5 s crossfade; otherwise
+    # retaining two 1080p video decoders for the whole shot may exhaust RAM.
+    if idx > 0 and t - s < XF:
+        keep.add(getattr(SHOTS[idx - 1][2], 'path', None))
     for pth in list(_VS):
         if pth not in keep: _VS.pop(pth).close()
     c.set_source_rgb(0, 0, 0); c.paint()

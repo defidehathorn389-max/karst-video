@@ -3,7 +3,7 @@
 原创地理科普纪录短片 · 1920×1080 · 24fps · 7分33秒 · **v4：立体地貌与洞穴图解升级**
 
 ▶ **[播放 / 下载 karst.mp4](karst.mp4)**（1080p 压缩版，约 102MB）  
-▶ **[v4.0 发布页](../../releases/tag/v4.0)**（高清原版文件在 Releases）  
+▶ **[高清原版下载 · 163MB](../../releases/download/v4.0/karst_v4_1080p_HQ.mp4)**  |  **[v4.0 发布页](../../releases/tag/v4.0)**  
 ▶ **[v3 与 v4 同帧对比](preview/v3_vs_v4.jpg)**
 
 ### v4 动画升级
